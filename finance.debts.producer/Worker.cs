@@ -1,5 +1,6 @@
 using finance.debts.domain.Entities;
 using finance.debts.producer.Infrastructure;
+using finance.debts.Contracts;
 using MassTransit;
 
 namespace finance.debts.producer
@@ -7,8 +8,8 @@ namespace finance.debts.producer
     public class Worker : BackgroundService
     {
         private readonly ILogger<Worker> _logger;
-
         private readonly IServiceScopeFactory _scopeFactory;
+
         public Worker(ILogger<Worker> logger, IServiceScopeFactory scopeFactory)
         {
             _logger = logger;
@@ -24,7 +25,7 @@ namespace finance.debts.producer
                 var correlationId = Guid.NewGuid();
 
                 var debt = new Debt(
-                    debtId: 0, 
+                    debtId: 0,
                     clientId: random.Next(1, 1000),
                     amountDue: Math.Round((decimal)random.NextDouble() * 2500, 2),
                     correlationId: correlationId
@@ -36,24 +37,23 @@ namespace finance.debts.producer
                 context.Debts.Add(debt);
                 await context.SaveChangesAsync(stoppingToken);
 
-                var publishEndpoint = scope.ServiceProvider.GetRequiredService<IPublishEndpoint>(); 
+                var publishEndpoint = scope.ServiceProvider.GetRequiredService<IPublishEndpoint>();
 
-                await publishEndpoint.Publish(new DebtCreatedEvent
+                await publishEndpoint.Publish<IDebtCreated>(new
                 {
                     DebtId = debt.DebtId,
-                    ClientId = debt.ClientId,
-                    AmountDue = debt.AmountDue,
-                    CorrelationId = correlationId
+                    Amount = debt.AmountDue,
+                    Document = debt.ClientId.ToString(),
+                    CreatedAt = DateTime.UtcNow
                 },
                 ctx =>
                 {
                     ctx.CorrelationId = correlationId;
                 });
 
-                _logger.LogInformation("Saved Debt to DB: ClientId={ClientId}, Amount={Amount}",
-                    debt.ClientId, debt.AmountDue);
+                _logger.LogInformation("Evento publicado | DebtId={DebtId}", debt.DebtId);
 
-                await Task.Delay(5000, stoppingToken);
+                await Task.Delay(3000, stoppingToken);
             }
         }
     }

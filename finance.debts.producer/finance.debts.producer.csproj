@@ -8,8 +8,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MassTransit" Version="9.0.1" />
-    <PackageReference Include="MassTransit.RabbitMQ" Version="9.0.1" />
+	<PackageReference Include="MassTransit" Version="8.2.5" />
+	<PackageReference Include="MassTransit.RabbitMQ" Version="8.2.5" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.14" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.14" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.14">
@@ -25,6 +25,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\finance-debts-domain\finance.debts\finance.debts.domain\finance.debts.domain.csproj" />
+    <ProjectReference Include="..\..\finance-debts-domain\finance.debts.domain\finance.debts.domain.csproj" />
   </ItemGroup>
 </Project>
